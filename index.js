@@ -97,7 +97,7 @@ function createBundleThenRun (relativeTo, options, done) {
 }
 
 
-function FeatherTest (config) {
+function FeatherTestBrowser (config) {
     config = config || {};
 
     if (typeof config !== 'object') {
@@ -114,6 +114,7 @@ function FeatherTest (config) {
     var defaultConfig = {
         destDir: './feather',
         dirnameAvailable: true,
+        exitProcessWhenFailing: true,
         helpers: [],
         stopAfterFistFailure: false,
         timeout: 5000
@@ -134,6 +135,8 @@ function FeatherTest (config) {
     this.run = function (callback) {
         var options = this.config;
         var relativeTo = this._relativeTo || discoverSourcePath(3);
+
+        utils.cleanDir(options.destDir);
 
         createBundleThenRun(relativeTo, options, function (testBundle) {
             console.log('\nRun your test in any browser: ' + testBundle.html);
@@ -157,4 +160,4 @@ function FeatherTest (config) {
     };
 }
 
-module.exports = FeatherTest;
+module.exports = FeatherTestBrowser;
