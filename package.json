@@ -1,0 +1,39 @@
+{
+  "name": "feather-test-browser",
+  "version": "1.0.0",
+  "description": "Lightweight test coverage for browser-ready code",
+  "keywords": [
+    "feather",
+    "testing",
+    "bundled",
+    "browser",
+    "lightweight",
+    "easy",
+    "jasmine",
+    "karma",
+    "alternative"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/automated"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seebigs/feather-test-browser.git"
+  },
+  "author": "Chris Bigelow <seebigswork@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/seebigs/feather-test-browser/issues"
+  },
+  "devDependencies": {
+    "chalk": "^2.0.1"
+  },
+  "dependencies": {
+    "bundl-pack": "^0.6.4",
+    "discover-source-path": "^0.1.0",
+    "feather-test": "^3.0.0",
+    "node-as-browser": "^1.1.4",
+    "seebigs-utils": "^1.4.1"
+  }
+}
