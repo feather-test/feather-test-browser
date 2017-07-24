@@ -75,11 +75,12 @@ function createBundleThenRun (relativeTo, options, done) {
     concat += '\n// report results\n';
     concat += 'featherTest.report(global.FeatherTestBrowserCallback);';
 
-    var testBundleOptions = {
+    var bundlPackOptions = {
         leadingComments: false,
-        obscure: true
+        obscure: true,
     };
-    var testBundle = bundlPack(testBundleOptions).one.call({ LINES: concat.split('\n').length + 3 }, concat, {
+    Object.assign(bundlPackOptions, options.bundlPack);
+    var testBundle = bundlPack(bundlPackOptions).one.call({ LINES: concat.split('\n').length + 3 }, concat, {
         name: 'test.js',
         contents: concat,
         src: [],

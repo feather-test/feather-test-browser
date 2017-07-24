@@ -3,6 +3,7 @@
  */
 
 var chalk = require('chalk');
+var fs = require('fs');
 var utils = require('seebigs-utils');
 
 // override console.log so we can validate output
@@ -47,6 +48,12 @@ const errors = require('./configurations/errors.js');
 const timeout = require('./configurations/timeout.js');
 
 passing(function () {
+    let bundledTestFile = fs.readFileSync(__dirname + '/../feather/test.js', 'utf8');
+    if (bundledTestFile.indexOf('let ') !== -1) {
+        LOG.out();
+        validate.all(['bundl-pack-babel not working'],['bundl-pack-babel working']);
+    }
+
     modules(function () {
         global.wrongValue = 666;
         failing(function () {

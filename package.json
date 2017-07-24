@@ -27,6 +27,7 @@
     "url": "https://github.com/seebigs/feather-test-browser/issues"
   },
   "devDependencies": {
+    "bundl-pack-babel": "^0.1.1",
     "chalk": "^2.0.1"
   },
   "dependencies": {

@@ -1,3 +1,4 @@
+const babelProcessor = require('bundl-pack-babel');
 const FeatherTest = require('../../index.js');
 
 var testSuite = new FeatherTest({
@@ -14,7 +15,12 @@ var testSuite = new FeatherTest({
                 return actual * 3 === expected;
             }
         }
-    ]
+    ],
+    bundlPack: {
+        js: babelProcessor({
+            presets: ['es2015'],
+        })
+    }
 });
 
 testSuite.queue('../specs/features');
