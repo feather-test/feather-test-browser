@@ -100,6 +100,22 @@ $ npm test
 ## Configuration and Options
 See [feather-test](https://github.com/seebigs/feather-test) for full documentation on assertions, matchers, and other options that are available in feather-test-browser.
 
+## ES6 with Babel
+If you need to run modern code in older browsers you can pass options into the bundler. See [bundl-pack](https://github.com/seebigs/bundl-pack) for more options.
+```js
+var FeatherTestBrowser = require('feather-test-browser');
+var babelProcessor = require('bundl-pack-babel');
+
+var myTests = new FeatherTestBrowser({
+    specs: './specs',
+    bundlPack: {
+        js: babelProcessor({
+            presets: ['es2015-ie'],
+        })
+    }
+});
+```
+
 ## Additional Spec Methods
 *The following plugins are added in browser mode*
 
