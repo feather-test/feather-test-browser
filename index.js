@@ -54,14 +54,25 @@ function createBundleThenRun (relativeTo, options, done) {
         }
     }
 
+    function requirePlugin (pluginFile, pluginName) {
+        var pathToPlugin = path.resolve(relativeTo, pluginFile);
+        concat += 'featherTest.addPlugin("' + pluginName + '", require("' + pathToPlugin + '"));\n'
+    }
+
     var bundledOptions = clone(options);
-    delete bundledOptions.destDir; // hide full paths from the pubilc bundle
+
+    // hide full paths from the pubilc bundle
+    delete bundledOptions.destDir;
+    delete bundledOptions.plugins;
 
     concat += '// setup feather-test-runner\n';
     concat += 'var featherTestOptions = ' + tostring.fromObject(bundledOptions) + '\n';
     concat += 'var FeatherTestRunner = require("' + pathToFeatherRunner + '");\n';
     concat += 'var featherTest = new FeatherTestRunner(featherTestOptions);\n';
     concat += 'featherTest.listen();\n'
+
+    concat += '\n// load your plugins\n';
+    utils.each(options.plugins, requirePlugin);
 
     concat += '\n// load your helpers\n';
     utils.each(options.helpers, requireFile);
@@ -118,10 +129,14 @@ function FeatherTestBrowser (config) {
         exitProcessWhenFailing: true,
         helpers: [],
         stopAfterFistFailure: false,
-        timeout: 5000
+        timeout: 5000,
     };
     var extendedConfig = Object.assign({}, defaultConfig, config, utils.args());
     extendedConfig.destDir = path.resolve(extendedConfig.destDir);
+    extendedConfig.plugins = extendedConfig.plugins || {};
+    Object.assign(extendedConfig.plugins, {
+        external: __dirname + '/./lib/external.js',
+    });
 
     this.config = extendedConfig;
 
