@@ -158,7 +158,7 @@ function FeatherTestBrowser (config) {
             console.log('\nRun your test in any browser: ' + testBundle.html);
 
             if (!global.document) {
-                nodeAsBrowser.init(global);
+                nodeAsBrowser.init();
             }
 
             global.FeatherTestBrowserCallback = function () {
