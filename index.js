@@ -128,6 +128,7 @@ function FeatherTestBrowser (config) {
         dirnameAvailable: true,
         exitProcessWhenFailing: true,
         helpers: [],
+        nodeAsBrowser: {},
         stopAfterFistFailure: false,
         timeout: 5000,
     };
@@ -158,7 +159,7 @@ function FeatherTestBrowser (config) {
             console.log('\nRun your test in any browser: ' + testBundle.html);
 
             if (!global.document) {
-                nodeAsBrowser.init();
+                nodeAsBrowser.init(options.nodeAsBrowser);
             }
 
             global.FeatherTestBrowserCallback = function () {
