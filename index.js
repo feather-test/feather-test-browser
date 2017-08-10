@@ -129,7 +129,7 @@ function FeatherTestBrowser (config) {
         exitProcessWhenFailing: true,
         helpers: [],
         nodeAsBrowser: {},
-        stopAfterFistFailure: false,
+        stopAfterFirstFailure: false,
         timeout: 5000,
     };
     var extendedConfig = Object.assign({}, defaultConfig, config, utils.args());
