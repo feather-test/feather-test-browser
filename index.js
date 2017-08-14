@@ -3,19 +3,21 @@ const clone = require('./lib/clone.js');
 const discoverSourcePath = require('discover-source-path');
 const fs = require('fs');
 const nodeAsBrowser = require('node-as-browser');
-const opn = require('./lib/opn.js');
 const path = require('path');
+const template = require('./lib/template.js');
 const tostring = require('./lib/tostring.js');
 const utils = require('seebigs-utils');
 
+const featherReporter = require('feather-test/bundle_ready/reporter.js');
 const pathToFeatherTest = dropFileName(require.resolve('feather-test'));
 const pathToFeatherRunner = pathToFeatherTest + '/bundle_ready/runner.js';
 
-function dropFileName (path) {
-    let pathParts = path.split('/');
-    pathParts.pop();
-    return pathParts.join('/');
-}
+let currentSpecNum = -1;
+
+const bundlPackOptions = {
+    leadingComments: false,
+    obscure: true,
+};
 
 function clearRequireCache () {
     for (var x in require.cache) {
@@ -23,40 +25,23 @@ function clearRequireCache () {
     }
 }
 
-function createBundleThenRun (relativeTo, options, done) {
+function createFeatherRunnerBundle (options, done) {
     var concat = '';
-    var latestDirname = '';
 
-    function writeRequireIntoBundle (pathToFile) {
+    function writeRequire (pathToFile) {
         if (options.dirnameAvailable) {
             var dirname = pathToFile.split('/');
             dirname.pop();
             dirname = dirname.join('/');
-            if (dirname !== latestDirname) {
-                concat += '__dirname = "' + dirname + '";\n';
-                latestDirname = dirname;
-            }
+            concat += '__dirname = "' + dirname + '";\n';
         }
         concat += 'require.cache.clear();\n';
         concat += 'require("' + pathToFile + '");\n';
     }
 
-    function requireFile (specFile) {
-        var pathToFile = path.resolve(relativeTo, specFile);
-        var stats = fs.statSync(pathToFile);
-        if (stats.isFile()) {
-            writeRequireIntoBundle(pathToFile);
-        } else {
-            var files = utils.listFiles(pathToFile);
-            files.forEach(function (file) {
-                writeRequireIntoBundle(path.resolve(relativeTo, file));
-            });
-        }
-    }
-
-    function requirePlugin (pluginFile, pluginName) {
-        var pathToPlugin = path.resolve(relativeTo, pluginFile);
-        concat += 'featherTest.addPlugin("' + pluginName + '", require("' + pathToPlugin + '"));\n'
+    function writeAddPlugin (pathToPlugin, pluginName) {
+        console.log(pathToPlugin, pluginName);
+        concat += 'FeatherTest.addPlugin("' + pluginName + '", require("' + pathToPlugin + '"));\n'
     }
 
     var bundledOptions = clone(options);
@@ -65,47 +50,100 @@ function createBundleThenRun (relativeTo, options, done) {
     delete bundledOptions.destDir;
     delete bundledOptions.plugins;
 
+    concat += '// setup globals\n';
+    concat += 'if (!window.global){ window.global = window; }\n';
+
     concat += '// setup feather-test-runner\n';
     concat += 'var featherTestOptions = ' + tostring.fromObject(bundledOptions) + '\n';
     concat += 'var FeatherTestRunner = require("' + pathToFeatherRunner + '");\n';
-    concat += 'var featherTest = new FeatherTestRunner(featherTestOptions);\n';
-    concat += 'featherTest.listen();\n'
+    concat += 'global.FeatherTest = new FeatherTestRunner(featherTestOptions);\n';
+    concat += 'FeatherTest.listen();\n'
 
     concat += '\n// load your plugins\n';
-    utils.each(options.plugins, requirePlugin);
+    utils.each(options.plugins, writeAddPlugin);
 
     concat += '\n// load your helpers\n';
-    utils.each(options.helpers, requireFile);
+    utils.each(options.helpers, writeRequire);
 
-    concat += '\n// run your specs\n';
-    utils.each(options.specs, requireFile);
-
-    concat += '\n// cleanup environment\n'
-    concat += '__dirname = "/";\n';
-
-    concat += '\n// report results\n';
-    concat += 'featherTest.report(global.FeatherTestBrowserCallback);';
-
-    var bundlPackOptions = {
-        leadingComments: false,
-        obscure: true,
-    };
-    Object.assign(bundlPackOptions, options.bundlPack);
     var testBundle = bundlPack(bundlPackOptions).one.call({ LINES: concat.split('\n').length + 3 }, concat, {
-        name: 'test.js',
+        name: 'featherRunner.js',
         contents: concat,
         src: [],
         sourcemaps: []
     });
 
-    utils.writeFile(options.destDir + '/test.js', testBundle.contents, function () {
-        utils.writeFile(options.destDir + '/test.html', utils.readFile(__dirname + '/lib/test.html'), function (written) {
-            done({
-                html: options.destDir + '/test.html',
-                js: options.destDir + '/test.js'
-            });
-        });
+    utils.writeFile(options.destDir + '/featherRunner.js', testBundle.contents, done);
+}
+
+function createFeatherSpecBundle (options, done) {
+    var concat = '';
+
+    concat += '\n// run your specs\n';
+    // need __dirname
+    concat += 'require.cache.clear();\n';
+    concat += 'switch (global.FeatherTestBrowserCurrentSpec) {\n';
+
+    utils.each(options.specs, function (spec) {
+        concat += '   case "' + spec + '":\n';
+        concat += '      require("' + spec + '");\n';
+        concat += '      break;\n';
     });
+    concat += '};\n';
+
+    concat += '\n// cleanup environment\n'
+    concat += '__dirname = "/";\n';
+
+    concat += '\n// report results\n';
+    concat += 'global.FeatherTestBrowserCallback();';
+
+    var testBundle = bundlPack(bundlPackOptions).one.call({ LINES: concat.split('\n').length + 3 }, concat, {
+        name: 'featherSpecs.js',
+        contents: concat,
+        src: [],
+        sourcemaps: []
+    });
+
+    utils.writeFile(options.destDir + '/featherSpecs.js', testBundle.contents, done);
+}
+
+function dropFileName (path) {
+    let pathParts = path.split('/');
+    pathParts.pop();
+    return pathParts.join('/');
+}
+
+function resolvePaths (arrayOfPaths, relativeTo) {
+    var resolved = [];
+
+    utils.each(arrayOfPaths, function (pathInput) {
+        var pathToFile = path.resolve(relativeTo, pathInput);
+        var stats = fs.statSync(pathToFile);
+        if (stats.isFile()) {
+            resolved.push(pathToFile);
+        } else {
+            var files = utils.listFiles(pathToFile);
+            files.forEach(function (file) {
+                resolved.push(path.resolve(relativeTo, file));
+            });
+        }
+    });
+
+    return resolved;
+}
+
+function runSpecsUntilDone (specs, options, callback) {
+    currentSpecNum++;
+    if (currentSpecNum < specs.length) {
+        clearRequireCache();
+        nodeAsBrowser.init(options.nodeAsBrowser);
+        global.FeatherTestBrowserCurrentSpec = options.specs[currentSpecNum];
+        require(options.destDir + '/featherSpecs.js');
+    } else {
+        global.FeatherTest.report();
+        if (typeof callback === 'function') {
+            callback();
+        }
+    }
 }
 
 
@@ -138,6 +176,7 @@ function FeatherTestBrowser (config) {
     Object.assign(extendedConfig.plugins, {
         external: __dirname + '/./lib/external.js',
     });
+    Object.assign(bundlPackOptions, extendedConfig.bundlPack);
 
     this.config = extendedConfig;
 
@@ -153,26 +192,36 @@ function FeatherTestBrowser (config) {
         var options = this.config;
         var relativeTo = this._relativeTo || discoverSourcePath(3);
 
+        // flatten file paths
+        options.specs = resolvePaths(options.specs, relativeTo);
+        options.helpers = resolvePaths(options.helpers, relativeTo);
+
+        utils.each(options.plugins, function (pluginPath, pluginName) {
+            var pathToFile = path.resolve(relativeTo, pluginPath);
+            var stats = fs.statSync(pathToFile);
+            if (stats.isFile()) {
+                options.plugins[pluginName] = pathToFile;
+            } else {
+                delete options.plugins[pluginName];
+            }
+        });
+
         utils.cleanDir(options.destDir);
 
-        createBundleThenRun(relativeTo, options, function (testBundle) {
-            console.log('\nRun your test in any browser: ' + testBundle.html);
+        createFeatherRunnerBundle(options, function () {
+            createFeatherSpecBundle(options, function () {
+                utils.writeFile(options.destDir + '/test.html', utils.readFile(__dirname + '/lib/test.html'), function () {
+                    console.log('\nRun your test in any browser: ' + options.destDir + '/test.html');
 
-            if (!global.document) {
-                nodeAsBrowser.init(options.nodeAsBrowser);
-            }
+                    nodeAsBrowser.init(options.nodeAsBrowser);
+                    require(options.destDir + '/featherRunner.js');
 
-            global.FeatherTestBrowserCallback = function () {
-                clearRequireCache();
-                if (typeof callback === 'function') {
-                    callback();
-                }
-             };
-            require(testBundle.js);
-
-            if (options.open) {
-                opn(testBundle.html);
-            }
+                    global.FeatherTestBrowserCallback = function () {
+                        runSpecsUntilDone(options.specs, options, callback);
+                    };
+                    runSpecsUntilDone(options.specs, options, callback);
+                });
+            });
         });
     };
 }
