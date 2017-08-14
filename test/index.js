@@ -48,7 +48,7 @@ const errors = require('./configurations/errors.js');
 const timeout = require('./configurations/timeout.js');
 
 passing(function () {
-    let bundledTestFile = fs.readFileSync(__dirname + '/../feather/test.js', 'utf8');
+    let bundledTestFile = fs.readFileSync(__dirname + '/../feather/featherSpecs.js', 'utf8');
     if (bundledTestFile.indexOf('let ') !== -1) {
         LOG.out();
         validate.all(['bundl-pack-babel not working'],['bundl-pack-babel working']);
