@@ -94,6 +94,7 @@ function createFeatherSpecBundle (options, relativeTo, done) {
 
     specBundleContents = template(specBundleContents, { specMap: specMap });
 
+
     let testBundle = bundlPack(bundlPackOptions).one.call({ LINES: specBundleContents.split('\n').length + 3 }, specBundleContents, {
         name: 'featherSpecs.js',
         contents: specBundleContents,
@@ -145,6 +146,7 @@ function resolvePaths (arrayOfPaths, relativeTo) {
 
 function runSpecsUntilDone (specs, options, relativeTo, callback) {
     currentSpecNum++;
+    console.log(currentSpecNum, specs.length);
     if (currentSpecNum < specs.length) {
         console.log('GLOBAL RESET');
         clearRequireCache();
@@ -211,7 +213,22 @@ function FeatherTestBrowser (config) {
         let relativeTo = this._relativeTo || discoverSourcePath(3);
 
         // flatten file paths
-        options.specs = resolvePaths(options.specs, relativeTo);
+        options.specs = resolvePaths(options.specs, relativeTo).filter(function (v) {
+            if (typeof options.only === 'string') {
+                const specsToMatch = options.only.split(',');
+                let foundSomething = false;
+                specsToMatch.forEach(function (s) {
+                   if (v.indexOf(s) !== -1) {
+                       foundSomething = true;
+                   }
+                });
+                return foundSomething;
+            }
+            return true;
+        });
+
+        console.log(options.specs);
+
         options.helpers = resolvePaths(options.helpers, relativeTo);
 
         utils.each(options.plugins, function (pluginPath, pluginName) {
