@@ -11,8 +11,11 @@ const utils = require('seebigs-utils');
 const featherReporter = require('../feather-test/bundle_ready/reporter.js'); // FIXME
 const pathToFeatherTest = dropFileName(require.resolve('../feather-test')); // FIXME
 const pathToFeatherRunner = pathToFeatherTest + '/bundle_ready/runner.js';
+const pathToAssets = __dirname + '/assets';
 
 let currentSpecNum = -1;
+let numberOfAfterSpecCallbacksExecuted = 0;
+let megaResults = { passed: [], failed: [], skipped: [] };
 
 const bundlPackOptions = {
     leadingComments: false,
@@ -58,7 +61,7 @@ function createFeatherRunnerBundle (options, done) {
     concat += 'var featherTestOptions = ' + tostring.fromObject(bundledOptions) + '\n';
     concat += 'var FeatherTestRunner = require("' + pathToFeatherRunner + '");\n';
     concat += 'global.FeatherTest = new FeatherTestRunner(featherTestOptions);\n';
-    concat += 'FeatherTest.listen();\n'
+    concat += 'FeatherTest.listen();\n';
 
     concat += '\n// load your plugins\n';
     utils.each(options.plugins, writeAddPlugin);
@@ -92,7 +95,7 @@ function createFeatherSpecBundle (options, relativeTo, done) {
     });
     specMap += '}';
 
-    specBundleContents = template(specBundleContents, { specMap: specMap });
+    specBundleContents = template(specBundleContents, { specMap: specMap, gif: pathToAssets + '/finished.gif' });
 
 
     let testBundle = bundlPack(bundlPackOptions).one.call({ LINES: specBundleContents.split('\n').length + 3 }, specBundleContents, {
@@ -146,18 +149,32 @@ function resolvePaths (arrayOfPaths, relativeTo) {
 
 function runSpecsUntilDone (specs, options, relativeTo, callback) {
     currentSpecNum++;
-    console.log(currentSpecNum, specs.length);
     if (currentSpecNum < specs.length) {
-        console.log('GLOBAL RESET');
         clearRequireCache();
+        require(options.destDir + '/featherRunner.js');
+        let oldReporter = FeatherTest.reporter.report;
+
+        FeatherTest.reporter.report = function (results) {
+            numberOfAfterSpecCallbacksExecuted += 1;
+
+            megaResults.passed = megaResults.passed.concat(results.passed);
+            megaResults.failed = megaResults.failed.concat(results.failed);
+            megaResults.skipped = megaResults.skipped.concat(results.skipped);
+
+            if (numberOfAfterSpecCallbacksExecuted === specs.length) {
+                oldReporter(megaResults);
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            } else {
+                runSpecsUntilDone(specs, options, relativeTo, callback);
+            }
+        };
+
         nodeAsBrowser.init(options.nodeAsBrowser);
         global.FeatherTestBrowserCurrentSpec = getSpecName(options.specs[currentSpecNum], relativeTo);
         require(options.destDir + '/featherSpecs.js');
-    } else {
-        global.FeatherTest.report();
-        if (typeof callback === 'function') {
-            callback();
-        }
+        FeatherTest.report();
     }
 }
 
@@ -227,8 +244,6 @@ function FeatherTestBrowser (config) {
             return true;
         });
 
-        console.log(options.specs);
-
         options.helpers = resolvePaths(options.helpers, relativeTo);
 
         utils.each(options.plugins, function (pluginPath, pluginName) {
@@ -249,11 +264,7 @@ function FeatherTestBrowser (config) {
                     console.log('\nRun your test in any browser: ' + options.destDir + '/test.html');
 
                     nodeAsBrowser.init(options.nodeAsBrowser);
-                    require(options.destDir + '/featherRunner.js');
 
-                    global.FeatherTestBrowserCallback = function () {
-                        runSpecsUntilDone(options.specs, options, relativeTo, callback);
-                    };
                     runSpecsUntilDone(options.specs, options, relativeTo, callback);
                 });
             });

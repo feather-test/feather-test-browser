@@ -160,12 +160,40 @@ var FeatherTestSpecMap = {{specMap}};
 var inNode = !!global.FeatherTestBrowserCurrentSpec;
 
 function runNodeTests() {
-    for (var map in FeatherTestSpecMap) {
-        FeatherTestSpecMap[map]();
+    var spec = global.FeatherTestBrowserCurrentSpec;
+    if (spec) {
+        FeatherTestSpecMap[spec]();
+        if (typeof global.FeatherTestBrowserCallback === 'function') {
+            global.FeatherTestBrowserCallback();
+        }
+
+    } else {
+        for (var map in FeatherTestSpecMap) {
+            FeatherTestSpecMap[map]();
+        }
     }
 }
 
 function runBrowserTests() {
+    function printResultsFromStorage () {
+        var data = Storage.get('data');
+        var first = true;
+        each(data, function (v, k) {
+            v.results.splice(0, 0, k + ':'); /* add a colon to the end of the key string */
+            var strs = v.results.join("\\n");
+            if (!first) {
+                strs = '\\n\\n' + strs
+            }
+            console.log(strs);
+
+            var resultsContainer = document.getElementById('results');
+            if (resultsContainer) {
+                resultsContainer.innerHTML += strs;
+            }
+
+            first = false;
+        });
+    }
     function matchSpec(specName) {
         for (var key in FeatherTestSpecMap) {
             if (key.indexOf(specName) !== -1) {
@@ -244,14 +272,9 @@ function runBrowserTests() {
     var continuousRun = options.continuous;
     var spec = matchSpec(options.spec);
     var next = matchSpec(options.next);
+    var state = options.state;
 
-    if (!spec && !next || !continuousRun) {
-        Storage.delete('data');
-    }
-
-    runSpec(spec);
     var oldReporter = FeatherTest.reporter.report;
-    var output = "";
 
     FeatherTest.reporter.report = function (results) {
         var oldLog = console.log;
@@ -271,26 +294,64 @@ function runBrowserTests() {
         FeatherTest.reporter.report = oldReporter;
     };
 
-    FeatherTest.report(function () {
-        var data = Storage.get('data');
-        each(data, function (v, k) {
-            v.results.splice(0, 0, k + ':'); /* add a colon to the end of the key string */
-            var strs = v.results.join("\\n");
-            console.log(strs);
-        });
-    });
+    if (state === 'finished') {
+        document.body.style.background = '#eee';
+        document.body.innerHTML = '<div id="button" style="' +
+            'background-color: #794e79;' +
+            'width: 50%;' +
+            'max-width: 230px;' +
+            'border-radius: 6px;' +
+            'padding: 20px 40px;' +
+            'margin: 40px auto 30px auto;' +
+            'box-shadow: 1px 2px 3px rgba(0,0,0,0.5);' +
+            'font-size: 24px;' +
+            'color: white;' +
+            'text-align: center;' +
+            'font-family: sans-serif;' +
+            'cursor: pointer;' +
+        '">Run tests again</div>' +
+        '<img src="{{gif}}" style="' +
+            'width:100%;' +
+            'max-width: 800px;' +
+            'display: block;' +
+            'margin: auto;' +
+        '"/>' +
+        '<pre id="results" style="' +
+            'width: 100%;' +
+            'max-width: 800px;' +
+            'margin: 30px auto;' +
+        '"></pre>';
+
+        var button = document.getElementById('button');
+        button.onclick = function () { window.location.href = window.location.origin + window.location.pathname; };
+
+        FeatherTest.report(printResultsFromStorage);
+
+        /* short circuit return statement.
+         * dont run any tests.
+         * dont redirect the page anywhere.
+         * this is a really important line */
+        return;
+
+    } else if (!spec && !next || !continuousRun) {
+        Storage.delete('data');
+    }
+
+    runSpec(spec);
+
+    FeatherTest.report(printResultsFromStorage);
 
     var nextUrl = getUrlForNextTest(spec, next, continuousRun);
     if (nextUrl) {
         window.location.href = nextUrl;
+    } else {
+        window.location.href = window.location.origin + window.location.pathname + '?state=finished';
     }
 }
 
 if (inNode) {
     runNodeTests();
-    if (typeof global.FeatherTestBrowserCallback === "function") {
-        FeatherTest.report(global.FeatherTestBrowserCallback);
-    }
+
 } else {
     runBrowserTests();
 }
