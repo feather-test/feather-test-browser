@@ -8,7 +8,7 @@ const template = require('./lib/template.js');
 const tostring = require('./lib/tostring.js');
 const utils = require('seebigs-utils');
 
-const pathToFeatherTest = dropFileName(require.resolve('feather-test')); // FIXME
+const pathToFeatherTest = dropFileName(require.resolve('../feather-test')); // FIXME
 const pathToFeatherRunner = pathToFeatherTest + '/bundle_ready/runner.js';
 const pathToAssets = __dirname + '/assets';
 

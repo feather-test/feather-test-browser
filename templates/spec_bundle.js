@@ -274,24 +274,16 @@ function runBrowserTests() {
     var next = matchSpec(options.next);
     var state = options.state;
 
-    var oldReporter = FeatherTest.reporter.report;
-
-    FeatherTest.reporter.report = function (results) {
-        var oldLog = console.log;
-        var output = {};
-        console.log = function (msg) {
-            if (spec) {
-                output[spec] = output[spec] || {};
-                output[spec].results = output[spec].results || [];
-                if (msg) {
-                    output[spec].results.push(msg);
-                }
-                Storage.set('data', output);
+    var output = {};
+    FeatherTest.reporter.output =  function (msg) {
+        if (spec) {
+            output[spec] = output[spec] || {};
+            output[spec].results = output[spec].results || [];
+            if (msg) {
+                output[spec].results.push(msg);
             }
-        };
-        oldReporter(results);
-        console.log = oldLog;
-        FeatherTest.reporter.report = oldReporter;
+            Storage.set('data', output);
+        }
     };
 
     if (state === 'finished') {
