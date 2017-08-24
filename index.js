@@ -151,29 +151,30 @@ function runSpecsUntilDone (specs, options, relativeTo, callback) {
     if (currentSpecNum < specs.length) {
         clearRequireCache();
         require(options.destDir + '/featherRunner.js');
+
         let oldReporter = FeatherTest.reporter.report;
-
         FeatherTest.reporter.report = function (results) {
-            numberOfAfterSpecCallbacksExecuted += 1;
-
             megaResults.passed = megaResults.passed.concat(results.passed);
             megaResults.failed = megaResults.failed.concat(results.failed);
             megaResults.skipped = megaResults.skipped.concat(results.skipped);
+        };
 
+        global.FeatherTestBrowserCurrentSpec = getSpecName(options.specs[currentSpecNum], relativeTo);
+        require(options.destDir + '/featherSpecs.js');
+
+        FeatherTest.report(function () {
+            numberOfAfterSpecCallbacksExecuted += 1;
             if (numberOfAfterSpecCallbacksExecuted === specs.length) {
                 oldReporter(megaResults);
                 if (typeof callback === 'function') {
                     callback();
                 }
             } else {
+                // console.log('RESET GLOBAL STATE');
+                // nodeAsBrowser.init(options.nodeAsBrowser);
                 runSpecsUntilDone(specs, options, relativeTo, callback);
             }
-        };
-
-        nodeAsBrowser.init(options.nodeAsBrowser);
-        global.FeatherTestBrowserCurrentSpec = getSpecName(options.specs[currentSpecNum], relativeTo);
-        require(options.destDir + '/featherSpecs.js');
-        FeatherTest.report();
+        });
     }
 }
 

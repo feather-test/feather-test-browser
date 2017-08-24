@@ -359,5 +359,3 @@ if (inNode) {
 
 /* cleanup environment */
 __dirname = "/";
-
-
