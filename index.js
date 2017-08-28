@@ -163,8 +163,7 @@ function runInNodeUntilDone (specs, options, relativeToAsArray, callback) {
                     callback();
                 }
             } else {
-                // console.log('RESET GLOBAL STATE');
-                // nodeAsBrowser.init(options.nodeAsBrowser);
+                nodeAsBrowser.init(options.nodeAsBrowser);
                 runInNodeUntilDone(specs, options, relativeToAsArray, callback);
             }
         });
