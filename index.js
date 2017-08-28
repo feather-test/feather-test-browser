@@ -9,9 +9,9 @@ const path = require('path');
 const tostring = require('./lib/tostring.js');
 const utils = require('seebigs-utils');
 
+const pathToFeatherTestBrowser = __dirname;
 const pathToFeatherTest = dropFileName(require.resolve('feather-test'));
 const pathToFeatherRunner = pathToFeatherTest + '/bundle_ready/runner.js';
-const pathToAssets = __dirname + '/assets';
 
 let currentSpecNum = -1;
 let numberOfAfterSpecCallbacksExecuted = 0;
@@ -84,7 +84,8 @@ function createFeatherSpecBundle (options, relativeToAsArray, done) {
 
     let specBundleTemplate = Handlebars.compile(fs.readFileSync(__dirname + '/templates/featherSpecs.js', 'utf8'));
     let specBundleContents = specBundleTemplate({
-        passingImageSrc: pathToAssets + '/finished.gif',
+        pathToFeatherTestBrowser: pathToFeatherTestBrowser,
+        passingImage: '/assets/finished.gif',
         specMap: specMap,
     });
 
