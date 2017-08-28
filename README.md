@@ -2,8 +2,6 @@
 
 **Lightweight test coverage for browser-ready code**
 
-*Refactor safely -- without configuring a burdensome test suite*
-
 > Runs on the easy-to-use [feather-test](https://github.com/seebigs/feather-test) library
 
 ## Install
@@ -92,8 +90,8 @@ $ npm test
 
 ## Notes
 
-- Your browser-ready tests will automatically be run in NodeJS via [node-as-browser](https://github.com/seebigs/node-as-browser)
-- WARNING: the optional callback executes when run in NodeJS but cannot be passed into the browser environment
+- Your browser-ready tests will also be run in NodeJS with a simulated browser environment ([node-as-browser](https://github.com/seebigs/node-as-browser))
+- NOTE: the optional callback executes when run in NodeJS but cannot be passed into a real browser
 
 ---
 
@@ -117,14 +115,19 @@ var myTests = new FeatherTestBrowser({
 ```
 
 ## Additional Spec Methods
-*The following plugins are added in browser mode*
 
-### external
+### external.loadScript
 Load external scripts into your spec environment at runtime.
-- only available in browser mode
 - requires an absolute path reference to a script file (uses `file://` protocol)
 - scripts will be loaded asynchronously, but sequentially
-- console.log from within an external script does not output to terminal
+- FeatherTestBrowser should be initialized so that nodeAsBrowser uses the file:// protocol
+```js
+var testSuite = new FeatherTestBrowser({
+    nodeAsBrowser: {
+        url: 'file://' + __dirname,
+    }
+});
+```
 ```js
 describe('try loading a script', function (expect, done) {
     // ext files each execute `window.foo++`
