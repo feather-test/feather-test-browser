@@ -1,6 +1,6 @@
-const FeatherTest = require('../../index.js');
+const FeatherTestBrowser = require('../../index.js');
 
-var testSuite = new FeatherTest({
+var testSuite = new FeatherTestBrowser({
     exitProcessWhenFailing: false,
     specs: '../specs/errors'
 });

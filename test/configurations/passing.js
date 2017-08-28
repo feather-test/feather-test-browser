@@ -1,7 +1,7 @@
 const babelProcessor = require('bundl-pack-babel');
-const FeatherTest = require('../../index.js');
+const FeatherTestBrowser = require('../../index.js');
 
-var testSuite = new FeatherTest({
+var testSuite = new FeatherTestBrowser({
     exitProcessWhenFailing: false,
     helpers: [
         '../helpers/helper1.js',
@@ -20,6 +20,9 @@ var testSuite = new FeatherTest({
         js: babelProcessor({
             presets: ['es2015'],
         })
+    },
+    nodeAsBrowser: {
+        url: 'file://' + __dirname,
     }
 });
 

@@ -41,35 +41,34 @@ var validate = {
 
 };
 
-const passing = require('./configurations/passing.js');
-const failing = passing;
-const modules = require('./configurations/modules.js');
-const errors = require('./configurations/errors.js');
-const timeout = require('./configurations/timeout.js');
-
-passing(function () {
+require('./configurations/passing.js')(function () {
     let bundledTestFile = fs.readFileSync(__dirname + '/../feather/featherSpecs.js', 'utf8');
     if (bundledTestFile.indexOf('let ') !== -1) {
         LOG.out();
         validate.all(['bundl-pack-babel not working'],['bundl-pack-babel working']);
     }
 
-    modules(function () {
+    require('./configurations/modules.js')(function () {
         global.wrongValue = 666;
-        failing(function () {
+        require('./configurations/passing.js')(function () {
             delete global.wrongValue;
-            errors(function () {
-                timeout(function () {
+            require('./configurations/errors.js')(function () {
+                require('./configurations/timeout.js')(function () {
                     console.log = LOG.out;
                     console.log();
                     validate.all(LOG.history, [
 '*',
-'\nAll 18 tests passed!',
+'\nAll 20 tests passed!',
 '\n(1 tests skipped)',
 '*',
 '\nAll 3 tests passed!',
 '*',
 '\nFailed tests:',
+'',
+'async',
+'   asserts expectations now and later',
+'*',
+'*',
 '',
 'matchers',
 '*',
@@ -116,11 +115,6 @@ passing(function () {
 'additional outer blocks',
 '*',
 '',
-'async',
-'   asserts expectations now and later',
-'*',
-'*',
-'',
 '9 tests failed!',
 '\n(1 tests skipped)',
 '*',
@@ -135,7 +129,8 @@ passing(function () {
 '\nSpec timed out!\n',
 'timeout',
 '   is handled properly',
-'      should call done() within 100ms'
+'      should call done() within 100ms',
+'\nNo tests ran.',
                     ]);
                 });
             });

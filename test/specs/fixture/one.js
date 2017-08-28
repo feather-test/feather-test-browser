@@ -1,4 +1,4 @@
-varThree++;
+window.foo++;
 
 var two = require('./sub/two.js');
 var three = require('./sub/three.js');

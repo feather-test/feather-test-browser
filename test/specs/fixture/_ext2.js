@@ -1,3 +1,2 @@
 
-global.varOne++;
-window.varTwo++;
+window.foo++;
