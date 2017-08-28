@@ -1,2 +1,2 @@
 
-global.foo++;
+window.foo++;
