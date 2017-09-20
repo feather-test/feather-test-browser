@@ -255,7 +255,7 @@ function FeatherTestBrowser (config) {
         createFeatherRunnerBundle(options, function () {
             createFeatherSpecBundle(options, relativeToAsArray, function () {
                 utils.writeFile(options.destDir + '/test.html', utils.readFile(__dirname + '/lib/test.html'), function () {
-                    console.log('\nRun your test in any browser: ' + options.destDir + '/test.html');
+                    console.log('\nRun your test in any browser: ' + options.destDir + '/test.html\n');
 
                     nodeAsBrowser.init(options.nodeAsBrowser);
 
