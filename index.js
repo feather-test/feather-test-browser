@@ -159,7 +159,7 @@ function runInNodeUntilDone (specs, options, relativeToAsArray, callback) {
         FeatherTest.report(function () {
             numberOfAfterSpecCallbacksExecuted += 1;
             if (numberOfAfterSpecCallbacksExecuted === specs.length) {
-                oldReporter(megaResults);
+                oldReporter(megaResults, null, options);
                 if (typeof callback === 'function') {
                     callback();
                 }
