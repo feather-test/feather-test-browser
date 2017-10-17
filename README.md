@@ -2,7 +2,7 @@
 
 **Lightweight test coverage for browser-ready code**
 
-> Runs on the easy-to-use [feather-test](https://github.com/seebigs/feather-test) library
+> Runs the easy-to-use [feather-test](https://github.com/seebigs/feather-test) test suite in a [Headless Chrome](https://github.com/GoogleChrome/puppeteer) browser instance
 
 ## Install
 ```
