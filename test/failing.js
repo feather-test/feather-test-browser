@@ -1,2 +1,1 @@
-global.wrongValue = 666;
-require('./configurations/passing.js')();
+require('./configurations/failing.js')();

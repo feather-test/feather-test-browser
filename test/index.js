@@ -13,7 +13,7 @@ var LOG = {
 };
 console.log = function (msg) {
     LOG.history.push(msg);
-    // LOG.out(msg);
+    LOG.out(msg);
 };
 console.log.real = LOG.out;
 
@@ -29,13 +29,13 @@ var validate = {
             }
         });
         if (!unexpectedResults) {
-            LOG.out(chalk.green('   ✔ output is good'));
+            LOG.out(chalk.green('\n   ✔ output is good\n'));
         }
     },
 
     one: function (issues, actual, expected) {
         if (actual !== expected) {
-            issues.push(chalk.red('   ✘ Expected "' + actual + '" to read "' + expected + '"'));
+            issues.push(chalk.red('\n   ✘ Expected "' + actual + '" to read "' + expected + '"\n'));
         }
     }
 
@@ -49,9 +49,7 @@ require('./configurations/passing.js')(function () {
     }
 
     require('./configurations/modules.js')(function () {
-        global.wrongValue = 666;
-        require('./configurations/passing.js')(function () {
-            delete global.wrongValue;
+        require('./configurations/failing.js')(function () {
             require('./configurations/errors.js')(function () {
                 require('./configurations/timeout.js')(function () {
                     console.log = LOG.out;
@@ -150,11 +148,13 @@ require('./configurations/passing.js')(function () {
 '1 tests failed!',
 '*',
 'Running specs_timeout_timeout',
-'\nSpec timed out!\n',
+'\nFailed tests:',
+'',
 'timeout',
 '   is handled properly',
-'      should call done() within 100ms',
-'\nNo tests ran.',
+'*',
+'',
+'1 tests failed!',
                     ]);
                 });
             });

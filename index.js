@@ -4,8 +4,8 @@ const discoverSourcePath = require('discover-source-path');
 const dropFileName = require('./lib/dropFileName.js');
 const fs = require('fs');
 const Handlebars = require('handlebars');
-const nodeAsBrowser = require('node-as-browser');
 const path = require('path');
+const puppeteer = require('puppeteer');
 const tostring = require('./lib/tostring.js');
 const utils = require('seebigs-utils');
 
@@ -13,20 +13,10 @@ const pathToFeatherTestBrowser = __dirname;
 const pathToFeatherTest = dropFileName(require.resolve('feather-test'));
 const pathToFeatherRunner = pathToFeatherTest + '/bundle_ready/runner.js';
 
-let currentSpecNum = -1;
-let numberOfAfterSpecCallbacksExecuted = 0;
-let megaResults = { passed: [], failed: [], skipped: [] };
-
 const bundlPackOptions = {
     leadingComments: false,
     obscure: true,
 };
-
-function clearRequireCache () {
-    for (let x in require.cache) {
-        delete require.cache[x];
-    }
-}
 
 function createFeatherRunnerBundle (options, done) {
     let bundledOptions = clone(options);
@@ -140,35 +130,57 @@ function resolvePaths (arrayOfPaths, relativeTo) {
     return resolved;
 }
 
-function runInNodeUntilDone (specs, options, relativeToAsArray, callback) {
-    currentSpecNum++;
-    if (currentSpecNum < specs.length) {
-        clearRequireCache();
-        require(options.destDir + '/featherRunner.js');
+function runChromeHeadless (testUrl, options, callback) {
+    puppeteer.launch().then((browser) => {
+        browser.newPage().then((page) => {
+            let failed = false;
 
-        let oldReporter = FeatherTest.reporter.report;
-        FeatherTest.reporter.report = function (results) {
-            megaResults.passed = megaResults.passed.concat(results.passed);
-            megaResults.failed = megaResults.failed.concat(results.failed);
-            megaResults.skipped = megaResults.skipped.concat(results.skipped);
-        };
-
-        global.FeatherTestBrowserCurrentSpec = getSpecName(options.specs[currentSpecNum], relativeToAsArray);
-        require(options.destDir + '/featherSpecs.js');
-
-        FeatherTest.report(function () {
-            numberOfAfterSpecCallbacksExecuted += 1;
-            if (numberOfAfterSpecCallbacksExecuted === specs.length) {
-                oldReporter(megaResults, null, options);
+            function shutdown () {
+                page.close().then(() => { browser.close(); });
+                if (failed && options.exitProcessWhenFailing) {
+                    process.exit(1);
+                }
                 if (typeof callback === 'function') {
                     callback();
                 }
-            } else {
-                nodeAsBrowser.init(options.nodeAsBrowser);
-                runInNodeUntilDone(specs, options, relativeToAsArray, callback);
             }
+
+            page.on('load', (r) => {
+                if (page.url().indexOf('state=finished') > 0) {
+                    shutdown();
+                }
+            });
+
+            page.on('pageerror', (errorMessage) => {
+                failed = true;
+                console.log();
+                console.log(errorMessage);
+                shutdown();
+            });
+
+            page.on('console', (msg) => {
+                switch (msg.type) {
+                    case 'info':
+                        if (msg.text.indexOf('Spec Output:') === 0) {
+                            // hide from terminal
+                        } else {
+                            console.log(msg.text);
+                        }
+                        break;
+
+                    case 'error':
+                        failed = true;
+                        console.log(msg.text);
+                        break;
+
+                    default:
+                        console.log(msg.text);
+                }
+            });
+
+            page.goto(testUrl).catch(console.log);
         });
-    }
+    });
 }
 
 
@@ -191,7 +203,6 @@ function FeatherTestBrowser (config) {
         dirnameAvailable: true,
         exitProcessWhenFailing: true,
         helpers: [],
-        nodeAsBrowser: {},
         stopAfterFirstFailure: false,
         timeout: 5000,
     };
@@ -256,10 +267,7 @@ function FeatherTestBrowser (config) {
             createFeatherSpecBundle(options, relativeToAsArray, function () {
                 utils.writeFile(options.destDir + '/test.html', utils.readFile(__dirname + '/lib/test.html'), function () {
                     console.log('\nRun your test in any browser: ' + options.destDir + '/test.html\n');
-
-                    nodeAsBrowser.init(options.nodeAsBrowser);
-
-                    runInNodeUntilDone(options.specs, options, relativeToAsArray, callback);
+                    runChromeHeadless('file://' + options.destDir + '/test.html', options, callback);
                 });
             });
         });
