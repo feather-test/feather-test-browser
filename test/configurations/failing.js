@@ -5,7 +5,8 @@ var testSuite = new FeatherTestBrowser({
     exitProcessWhenFailing: false,
     helpers: [
         '../helpers/helper1.js',
-        '../helpers/helper2.js'
+        '../helpers/helper2.js',
+        '../helpers/wrong.js'
     ],
     customMatchers: [
         {
