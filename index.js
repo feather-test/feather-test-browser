@@ -15,7 +15,7 @@ const pathToFeatherRunner = pathToFeatherTest + '/bundle_ready/runner.js';
 
 let currentSpecNum = -1;
 let numberOfAfterSpecCallbacksExecuted = 0;
-let megaResults = { passed: [], failed: [], skipped: [] };
+let megaResults = { passed: [], failed: [], skipped: [], slow: [] };
 
 const bundlPackOptions = {
     leadingComments: false,
@@ -150,6 +150,7 @@ function runInNodeUntilDone (specs, options, relativeToAsArray, callback) {
         FeatherTest.reporter.report = function (results) {
             megaResults.passed = megaResults.passed.concat(results.passed);
             megaResults.failed = megaResults.failed.concat(results.failed);
+            megaResults.slow = megaResults.slow.concat(results.slow);
             megaResults.skipped = megaResults.skipped.concat(results.skipped);
         };
 

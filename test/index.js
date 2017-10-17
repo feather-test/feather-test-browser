@@ -150,11 +150,13 @@ require('./configurations/passing.js')(function () {
 '1 tests failed!',
 '*',
 'Running specs_timeout_timeout',
-'\nSpec timed out!\n',
+'\nFailed tests:',
+'',
 'timeout',
 '   is handled properly',
-'      should call done() within 100ms',
-'\nNo tests ran.',
+'      Timed out! It should call done() within 100ms',
+'',
+'1 tests failed!'
                     ]);
                 });
             });
