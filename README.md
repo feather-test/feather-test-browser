@@ -120,14 +120,6 @@ var myTests = new FeatherTestBrowser({
 Load external scripts into your spec environment at runtime.
 - requires an absolute path reference to a script file (uses `file://` protocol)
 - scripts will be loaded asynchronously, but sequentially
-- FeatherTestBrowser should be initialized so that nodeAsBrowser uses the file:// protocol
-```js
-var testSuite = new FeatherTestBrowser({
-    nodeAsBrowser: {
-        url: 'file://' + __dirname,
-    }
-});
-```
 ```js
 describe('try loading a script', function (expect, done) {
     // ext files each execute `window.foo++`
