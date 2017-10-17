@@ -19,7 +19,7 @@ var testSuite = new FeatherTestBrowser({
     ],
     bundlPack: {
         js: babelProcessor({
-            presets: ['es2015'],
+            presets: ['env'],
         })
     },
 });
