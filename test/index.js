@@ -66,7 +66,7 @@ require('./configurations/passing.js')(function () {
 'Running specs_features_scope1',
 'Running specs_features_scope2',
 'Running specs_features_spy',
-'\nAll 20 tests passed!',
+'\nAll 22 tests passed!',
 '\n(1 tests skipped)',
 '*',
 'Running specs_modules_one_spec',

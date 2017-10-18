@@ -29,12 +29,12 @@
   "devDependencies": {
     "babel-preset-env": "^1.6.1",
     "bundl-pack-babel": "^0.1.1",
-    "chalk": "^2.0.1"
+    "chalk": "^2.2.0"
   },
   "dependencies": {
     "bundl-pack": "^0.6.4",
     "discover-source-path": "^0.1.0",
-    "feather-test": "3.4.0",
+    "feather-test": "3.4.1",
     "feathernet": "^0.3.1",
     "handlebars": "^4.0.10",
     "puppeteer": "^0.12.0",
