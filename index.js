@@ -131,7 +131,8 @@ function resolvePaths (arrayOfPaths, relativeTo) {
 }
 
 function runChromeHeadless (testUrl, options, callback) {
-    puppeteer.launch().then((browser) => {
+    const launchOpts = options.disableSandbox ? {args: ['--no-sandbox', '--disable-setuid-sandbox']} : {};
+    puppeteer.launch(launchOpts).then((browser) => {
         browser.newPage().then((page) => {
             let failed = false;
 
@@ -201,6 +202,7 @@ function FeatherTestBrowser (config) {
     let defaultConfig = {
         destDir: './feather',
         dirnameAvailable: true,
+        disableSandbox: false,
         exitProcessWhenFailing: true,
         helpers: [],
         stopAfterFirstFailure: false,
