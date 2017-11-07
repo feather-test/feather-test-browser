@@ -30,6 +30,8 @@ var validate = {
         });
         if (!unexpectedResults) {
             LOG.out(chalk.green('\n   ✔ output is good\n'));
+        } else {
+            process.exit(1);
         }
     },
 

@@ -21,10 +21,13 @@
     "type": "git",
     "url": "git+https://github.com/seebigs/feather-test-browser.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Chris Bigelow <seebigswork@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/seebigs/feather-test-browser/issues"
+    "url": "https://github.com/feather-test/feather-test-browser/issues"
   },
   "devDependencies": {
     "babel-preset-env": "^1.6.1",
