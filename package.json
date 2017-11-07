@@ -1,6 +1,6 @@
 {
   "name": "feather-test-browser",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Lightweight test coverage for browser-ready code",
   "keywords": [
     "feather",
@@ -34,7 +34,7 @@
   "dependencies": {
     "bundl-pack": "^0.6.4",
     "discover-source-path": "^0.1.0",
-    "feather-test": "3.4.2",
+    "feather-test": "~3.4.3",
     "feathernet": "^0.3.1",
     "handlebars": "^4.0.10",
     "puppeteer": "^0.12.0",
