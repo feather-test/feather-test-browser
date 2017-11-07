@@ -1,5 +1,7 @@
 # feather-test-browser
 
+<img src="https://travis-ci.org/feather-test/feather-test-browser.svg?branch=master"></img>
+
 **Lightweight test coverage for browser-ready code**
 
 > Runs the easy-to-use [feather-test](https://github.com/seebigs/feather-test) test suite in a [Headless Chrome](https://github.com/GoogleChrome/puppeteer) browser instance
