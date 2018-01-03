@@ -37,7 +37,7 @@
   "dependencies": {
     "bundl-pack": "^0.6.4",
     "discover-source-path": "^1.0.0",
-    "feather-test": "^3.5.1",
+    "feather-test": "^3.6.0",
     "feathernet": "^0.3.1",
     "handlebars": "^4.0.10",
     "puppeteer": "^0.13.0",

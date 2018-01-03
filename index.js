@@ -130,10 +130,12 @@ function resolvePaths (arrayOfPaths, relativeTo) {
     return resolved;
 }
 
-function runChromeHeadless (testUrl, options, callback) {
+function runChromeHeadless (testUrl, welcomeNote, options, callback) {
     const launchOpts = options.disableSandbox ? {args: ['--no-sandbox', '--disable-setuid-sandbox']} : {};
     puppeteer.launch(launchOpts).then((browser) => {
         browser.newPage().then((page) => {
+            console.log(welcomeNote);
+
             let failed = false;
 
             function shutdown () {
@@ -180,7 +182,15 @@ function runChromeHeadless (testUrl, options, callback) {
             });
 
             page.goto(testUrl).catch(console.log);
+        }).catch((err) => {
+            console.log('Error launching test page: ' + err.message + '\n');
+            console.log(err.stack);
+            process.exit(1);
         });
+    }).catch((err) => {
+        console.log('Error launching test browser: ' + err.message + '\n');
+        console.log(err.stack);
+        process.exit(1);
     });
 }
 
@@ -268,8 +278,8 @@ function FeatherTestBrowser (config) {
         createFeatherRunnerBundle(options, function () {
             createFeatherSpecBundle(options, relativeToAsArray, function () {
                 utils.writeFile(options.destDir + '/test.html', utils.readFile(__dirname + '/lib/test.html'), function () {
-                    console.log('\nRun your test in any browser: ' + options.destDir + '/test.html\n');
-                    runChromeHeadless('file://' + options.destDir + '/test.html', options, callback);
+                    var welcomeNote = '\nRun your test in any browser: ' + options.destDir + '/test.html\n';
+                    runChromeHeadless('file://' + options.destDir + '/test.html', welcomeNote, options, callback);
                 });
             });
         });
