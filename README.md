@@ -92,13 +92,21 @@ $ npm test
 
 ## Notes
 
-- Your browser-ready tests will also be run in NodeJS with a simulated browser environment ([node-as-browser](https://github.com/seebigs/node-as-browser))
-- NOTE: the optional callback executes when run in NodeJS but cannot be passed into a real browser
+- Your tests will automatically be run in command line using Headless Chrome as a background process
+- NOTE: the optional callback only executes when your tests are run in command line, not in browser
 
 ---
 
 ## Configuration and Options
-See [feather-test](https://github.com/seebigs/feather-test) for full documentation on assertions, matchers, and other options that are available in feather-test-browser.
+See [feather-test](https://github.com/feather-test/feather-test#configuration-options) for full documentation on assertions, matchers, and other options that are available in feather-test-browser.
+
+## Additional Options
+
+### dirnameAvailable
+
+If set to `true` the global `__dirname` variable will be available for use in specs and helpers. This is set to `false` by default for privacy because this exposes your local machine's user path in the generated bundles.
+
+---
 
 ## ES6 with Babel
 If you need to run modern code in older browsers you can pass options into the bundler. See [bundl-pack](https://github.com/seebigs/bundl-pack) for more options.

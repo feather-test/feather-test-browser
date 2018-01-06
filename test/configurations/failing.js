@@ -3,6 +3,7 @@ const FeatherTestBrowser = require('../../index.js');
 
 var testSuite = new FeatherTestBrowser({
     exitProcessWhenFailing: false,
+    dirnameAvailable: true,
     helpers: [
         '../helpers/helper1.js',
         '../helpers/helper2.js',

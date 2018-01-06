@@ -211,7 +211,7 @@ function FeatherTestBrowser (config) {
 
     let defaultConfig = {
         destDir: './feather',
-        dirnameAvailable: true,
+        dirnameAvailable: false,
         disableSandbox: false,
         exitProcessWhenFailing: true,
         helpers: [],
