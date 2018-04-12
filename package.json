@@ -15,7 +15,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "test": "node test"
+    "test": "node test -- -ci"
   },
   "repository": {
     "type": "git",
@@ -35,13 +35,16 @@
     "chalk": "^2.3.2"
   },
   "dependencies": {
+    "body-parser": "^1.18.2",
     "bundl-pack": "^0.6.4",
+    "deep-equal": "^1.0.1",
     "discover-source-path": "^1.0.0",
+    "express": "^4.16.3",
     "feather-test": "^4.0.0",
-    "feathernet": "^0.4.0",
     "handlebars": "^4.0.10",
     "puppeteer": "^1.2.0",
     "seebigs-each": "^1.1.0",
-    "seebigs-utils": "^1.4.1"
+    "seebigs-utils": "^1.4.1",
+    "useragent": "^2.3.0"
   }
 }

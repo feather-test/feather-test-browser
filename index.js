@@ -156,7 +156,7 @@ function runChromeHeadless (testUrl, welcomeNote, options, callback) {
 
             page.on('pageerror', (errorMessage) => {
                 failed = true;
-                console.log();
+                console.log('');
                 console.log(errorMessage);
                 shutdown();
             });
