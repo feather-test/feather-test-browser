@@ -161,23 +161,23 @@ function runChromeHeadless (testUrl, welcomeNote, options, callback) {
                 shutdown();
             });
 
-            page.on('console', (msg) => {
-                switch (msg.type) {
+            page.on('console', (consoleMessage) => {
+                switch (consoleMessage.type()) {
                     case 'info':
-                        if (msg.text.indexOf('Spec Output:') === 0) {
+                        if (consoleMessage.text().indexOf('Spec Output:') === 0) {
                             // hide from terminal
                         } else {
-                            console.log(msg.text);
+                            console.log(consoleMessage.text());
                         }
                         break;
 
                     case 'error':
                         failed = true;
-                        console.log(msg.text);
+                        console.log(consoleMessage.text());
                         break;
 
                     default:
-                        console.log(msg.text);
+                        console.log(consoleMessage.text());
                 }
             });
 

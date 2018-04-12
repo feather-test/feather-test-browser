@@ -32,16 +32,16 @@
   "devDependencies": {
     "babel-preset-env": "^1.6.1",
     "bundl-pack-babel": "^0.1.1",
-    "chalk": "^2.3.0"
+    "chalk": "^2.3.2"
   },
   "dependencies": {
     "bundl-pack": "^0.6.4",
     "discover-source-path": "^1.0.0",
-    "feather-test": "^3.6.0",
-    "feathernet": "^0.3.1",
+    "feather-test": "^4.0.0",
+    "feathernet": "^0.4.0",
     "handlebars": "^4.0.10",
-    "puppeteer": "^0.13.0",
-    "seebigs-each": "^1.0.1",
+    "puppeteer": "^1.2.0",
+    "seebigs-each": "^1.1.0",
     "seebigs-utils": "^1.4.1"
   }
 }
