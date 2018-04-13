@@ -2,6 +2,7 @@ const bundlPack = require('bundl-pack');
 const clone = require('./lib/clone.js');
 const discoverSourcePath = require('discover-source-path');
 const dropFileName = require('./lib/dropFileName.js');
+const FeatherNetServer = require('./feathernet/server');
 const fs = require('fs');
 const Handlebars = require('handlebars');
 const path = require('path');
@@ -16,6 +17,11 @@ const pathToFeatherRunner = pathToFeatherTest + '/bundle_ready/runner.js';
 const bundlPackOptions = {
     leadingComments: false,
     obscure: true,
+};
+
+const includedPlugins = {
+    external: __dirname + '/./lib/external.js',
+    network: __dirname + '/./feathernet/browser/index.js',
 };
 
 function createFeatherRunnerBundle (options, done) {
@@ -143,9 +149,7 @@ function runChromeHeadless (testUrl, welcomeNote, options, callback) {
                 if (failed && options.exitProcessWhenFailing) {
                     process.exit(1);
                 }
-                if (typeof callback === 'function') {
-                    callback();
-                }
+                callback();
             }
 
             page.on('load', (r) => {
@@ -221,9 +225,7 @@ function FeatherTestBrowser (config) {
     let extendedConfig = Object.assign({}, defaultConfig, config, utils.args());
     extendedConfig.destDir = path.resolve(extendedConfig.destDir);
     extendedConfig.plugins = extendedConfig.plugins || {};
-    Object.assign(extendedConfig.plugins, {
-        external: __dirname + '/./lib/external.js',
-    });
+    Object.assign(extendedConfig.plugins, includedPlugins);
     Object.assign(bundlPackOptions, extendedConfig.bundlPack);
 
     extendedConfig.reporter = {
@@ -263,6 +265,10 @@ function FeatherTestBrowser (config) {
 
         options.helpers = resolvePaths(options.helpers, relativeTo);
 
+        if (options.networkIntercept === true) {
+            options.networkIntercept = {};
+        }
+
         utils.each(options.plugins, function (pluginPath, pluginName) {
             let pathToFile = path.resolve(relativeTo, pluginPath);
             let stats = fs.statSync(pathToFile);
@@ -275,11 +281,24 @@ function FeatherTestBrowser (config) {
 
         utils.cleanDir(options.destDir);
 
+        var featherServer;
+        if (options.networkIntercept) {
+            featherServer = new FeatherNetServer(options.networkIntercept);
+            featherServer.start();
+        }
+
         createFeatherRunnerBundle(options, function () {
             createFeatherSpecBundle(options, relativeToAsArray, function () {
                 utils.writeFile(options.destDir + '/test.html', utils.readFile(__dirname + '/templates/test.html'), function () {
                     var welcomeNote = '\nRun your test in any browser: ' + options.destDir + '/test.html\n';
-                    runChromeHeadless('file://' + options.destDir + '/test.html', welcomeNote, options, callback);
+                    runChromeHeadless('file://' + options.destDir + '/test.html', welcomeNote, options, function () {
+                        if (options.networkIntercept && !options.networkIntercept.keepalive) {
+                            featherServer.stop();
+                        }
+                        if (typeof callback === 'function') {
+                            callback();
+                        }
+                    });
                 });
             });
         });

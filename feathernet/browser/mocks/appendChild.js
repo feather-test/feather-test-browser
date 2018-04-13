@@ -1,10 +1,10 @@
 const intercept = require('../intercept.js');
 
-function createMockAppendChild (origAppendChild, config) {
+function createMockAppendChild (origAppendChild, hostOverride) {
     function mockAppendChild (elem) {
         if (!elem) { return; }
         let targetElem = this;
-        elem.src = intercept(elem.src, config.hostOverride, mockAppendChild);
+        elem.src = intercept(elem.src, hostOverride, mockAppendChild);
         return origAppendChild.call(targetElem, elem);
     }
 

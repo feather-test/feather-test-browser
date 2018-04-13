@@ -1,6 +1,5 @@
 const babelProcessor = require('bundl-pack-babel');
 const FeatherTestBrowser = require('../../index.js');
-const FeatherNetServer = require('../../feathernet/server');
 const utils = require('seebigs-utils');
 const args = utils.args();
 
@@ -9,7 +8,8 @@ var testSuite = new FeatherTestBrowser({
     dirnameAvailable: true,
     helpers: [
         '../helpers/helper1.js',
-        '../helpers/helper2.js'
+        '../helpers/helper2.js',
+        '../helpers/mocks.js',
     ],
     customMatchers: [
         {
@@ -25,20 +25,14 @@ var testSuite = new FeatherTestBrowser({
             presets: ['env'],
         })
     },
+    networkIntercept: {
+        keepalive: !args.ci,
+    },
 });
 
 testSuite.queue('../specs/feathernet');
 testSuite.helpers('../helpers/globbed');
 
 module.exports = function (callback) {
-    const featherNet = new FeatherNetServer();
-    featherNet.start();
-    testSuite.run(function () {
-        if (typeof callback === 'function') {
-            callback();
-        }
-        if (args.ci) {
-            featherNet.stop();
-        }
-    });
+    testSuite.run(callback);
 };

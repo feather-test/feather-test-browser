@@ -1,8 +1,8 @@
 const intercept = require('../intercept.js');
 
-function createMockFetch (origFetch, config) {
+function createMockFetch (origFetch, hostOverride) {
     function mockFetch (url, options) {
-        let mockedUrl = intercept(url, config.hostOverride, mockFetch) || '';
+        let mockedUrl = intercept(url, hostOverride, mockFetch) || '';
         return origFetch.call(this, mockedUrl, options);
     };
 

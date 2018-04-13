@@ -1,8 +1,6 @@
-const mocks = require('../../helpers/mocks.js');
-
 describe('xhr', () => {
 
-    mocks.on();
+    network.startIntercept();
 
     describe('overrides in all environments', (expect) => {
         expect(window.XMLHttpRequest.prototype.open.name).toBe('mockOpen', 'browser');
@@ -76,6 +74,6 @@ describe('xhr', () => {
 
     });
 
-    mocks.off();
+    network.stopIntercept();
 
 });

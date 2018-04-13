@@ -1,8 +1,6 @@
-const mocks = require('../../helpers/mocks.js');
-
 describe('calls', () => {
 
-    mocks.on();
+    network.startIntercept();
 
     describe('fetch collects calls', (expect) => {
         fetch('http://noresponse.com/calls-fetch');
@@ -36,6 +34,6 @@ describe('calls', () => {
         expect(navigator.sendBeacon.calls[2].url).toBe('https://greetings.com/calls-sendbeacon');
     });
 
-    mocks.off();
+    network.stopIntercept();
 
 });

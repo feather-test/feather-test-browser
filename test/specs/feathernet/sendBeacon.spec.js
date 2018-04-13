@@ -1,8 +1,6 @@
-const mocks = require('../../helpers/mocks.js');
-
 describe('sendBeacon', () => {
 
-    mocks.on();
+    network.startIntercept();
 
     describe('overrides in all environments', (expect) => {
         expect(window.navigator.sendBeacon.name).toBe('mockSendBeacon', 'browser');
@@ -21,6 +19,6 @@ describe('sendBeacon', () => {
         expect(errors).toBe(false);
     });
 
-    mocks.off();
+    network.stopIntercept();
 
 });

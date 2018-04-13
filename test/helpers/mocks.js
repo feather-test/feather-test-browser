@@ -1,7 +1,5 @@
-const FeatherNetBrowser = require('../../feathernet/browser');
-const featherNet = new FeatherNetBrowser();
 
-featherNet.addMocks([
+network.addMocks([
     {
         request: 'noresponse.com'
     },
@@ -60,20 +58,7 @@ featherNet.addMocks([
     {
         request: '/javascripts/somefile.js',
         response: {
-            file: __dirname + '/../fixture/somefile.js',
+            file: __dirname + '/../specs/fixture/somefile.js',
         }
     },
 ]);
-
-function on() {
-    featherNet.install();
-}
-
-function off() {
-    featherNet.uninstall();
-}
-
-module.exports = {
-    on,
-    off,
-};

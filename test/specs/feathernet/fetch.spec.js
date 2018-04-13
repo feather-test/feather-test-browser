@@ -1,8 +1,6 @@
-const mocks = require('../../helpers/mocks.js');
-
 describe('fetch', () => {
 
-    mocks.on();
+    network.startIntercept();
 
     describe('overrides in all environments', (expect) => {
         expect(window.fetch.name).toBe('mockFetch', 'browser');
@@ -105,6 +103,6 @@ describe('fetch', () => {
 
     });
 
-    mocks.off();
+    network.stopIntercept();
 
 });

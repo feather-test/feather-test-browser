@@ -19,65 +19,67 @@ _window._origWindowFetch = _origWindowFetch;
 _window._origWindowXhr = _origWindowXhr;
 _window._origAppendChild = _origAppendChild;
 
-function FeatherNetBrowser (config) {
-    config = config || {};
+let hostOverride = 'localhost:9876';
 
-    if (!config.hostOverride) {
-        config.hostOverride = 'localhost:9876';
-    };
-
-    this.install = function () {
-        _window.Node.prototype.appendChild = createMockAppendChild(_origAppendChild, config);
-        if (window) {
-            window.fetch = createMockFetch(_origWindowFetch, config);
-            window.XMLHttpRequest = createMockXhr(_origWindowXhr, config);
-            if (window.navigator) {
-                window.navigator.sendBeacon = createMockSendBeacon(_origWindowSendBeacon, config);
-            }
-        }
-        if (global) {
-            global.fetch = createMockFetch(_origNodeFetch, config);
-            global.XMLHttpRequest = createMockXhr(_origNodeXhr, config);
-            if (global.navigator) {
-                global.navigator.sendBeacon = createMockSendBeacon(_origNodeSendBeacon, config);
-            }
-        }
-    };
-
-    this.uninstall = function () {
-        _window.Node.prototype.appendChild = _origAppendChild;
-        if (window) {
-            window.fetch = _origWindowFetch;
-            window.XMLHttpRequest = _origWindowXhr;
-            if (window.navigator) {
-                window.navigator.sendBeacon = _origWindowSendBeacon;
-            }
-        }
-        if (global) {
-            global.fetch = _origNodeFetch;
-            global.XMLHttpRequest = _origNodeXhr;
-            if (global.navigator) {
-                global.navigator.sendBeacon = _origNodeSendBeacon;
-            }
-        }
-    };
-
-    this.addMocks = function (mocks) {
-        var options = {
-            method: 'post',
-            headers: {
-                'Content-Type': 'text/plain',
-            },
-            body: JSON.stringify(mocks),
-        };
-        (_origWindowFetch || _origNodeFetch)('http://localhost:9877/feathernet-addMocks', options);
-    };
-
-    this.clearMocks = function () {
-        (_origWindowFetch || _origNodeFetch)('http://localhost:9877/feathernet-clearMocks', { method: 'post' });
-    };
-
-    this.clearMocks();
+function setHostOverride(newOverride) {
+    hostOverride = newOverride;
 }
 
-module.exports = FeatherNetBrowser;
+function startIntercept() {
+    _window.Node.prototype.appendChild = createMockAppendChild(_origAppendChild, hostOverride);
+    if (window) {
+        window.fetch = createMockFetch(_origWindowFetch, hostOverride);
+        window.XMLHttpRequest = createMockXhr(_origWindowXhr, hostOverride);
+        if (window.navigator) {
+            window.navigator.sendBeacon = createMockSendBeacon(_origWindowSendBeacon, hostOverride);
+        }
+    }
+    if (global) {
+        global.fetch = createMockFetch(_origNodeFetch, hostOverride);
+        global.XMLHttpRequest = createMockXhr(_origNodeXhr, hostOverride);
+        if (global.navigator) {
+            global.navigator.sendBeacon = createMockSendBeacon(_origNodeSendBeacon, hostOverride);
+        }
+    }
+};
+
+function stopIntercept() {
+    _window.Node.prototype.appendChild = _origAppendChild;
+    if (window) {
+        window.fetch = _origWindowFetch;
+        window.XMLHttpRequest = _origWindowXhr;
+        if (window.navigator) {
+            window.navigator.sendBeacon = _origWindowSendBeacon;
+        }
+    }
+    if (global) {
+        global.fetch = _origNodeFetch;
+        global.XMLHttpRequest = _origNodeXhr;
+        if (global.navigator) {
+            global.navigator.sendBeacon = _origNodeSendBeacon;
+        }
+    }
+};
+
+function addMocks(mocks) {
+    var options = {
+        method: 'post',
+        headers: {
+            'Content-Type': 'text/plain',
+        },
+        body: JSON.stringify(mocks),
+    };
+    (_origWindowFetch || _origNodeFetch)('http://localhost:9877/feathernet-addMocks', options);
+};
+
+function clearMocks() {
+    (_origWindowFetch || _origNodeFetch)('http://localhost:9877/feathernet-clearMocks', { method: 'post' });
+};
+
+module.exports = {
+    addMocks,
+    clearMocks,
+    setHostOverride,
+    startIntercept,
+    stopIntercept,
+};
