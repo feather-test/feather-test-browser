@@ -277,7 +277,7 @@ function FeatherTestBrowser (config) {
 
         createFeatherRunnerBundle(options, function () {
             createFeatherSpecBundle(options, relativeToAsArray, function () {
-                utils.writeFile(options.destDir + '/test.html', utils.readFile(__dirname + '/lib/test.html'), function () {
+                utils.writeFile(options.destDir + '/test.html', utils.readFile(__dirname + '/templates/test.html'), function () {
                     var welcomeNote = '\nRun your test in any browser: ' + options.destDir + '/test.html\n';
                     runChromeHeadless('file://' + options.destDir + '/test.html', welcomeNote, options, callback);
                 });

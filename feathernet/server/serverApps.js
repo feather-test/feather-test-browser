@@ -61,14 +61,6 @@ function createAdmin (featherServer, serverOptions) {
         featherServer.mocks = [];
         res.send('');
     });
-
-    admin.get('/feather', function (req, res) {
-        res.sendFile(path.resolve(__dirname + '/../feather/test.html'));
-    });
-
-    admin.get('/test.js', function (req, res) {
-        res.sendFile(path.resolve(__dirname + '/../feather/test.js'));
-    });
 }
 
 function createImpostor (featherServer, serverOptions) {
