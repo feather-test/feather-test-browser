@@ -10,7 +10,7 @@ function allowCors (app) {
     app.all('*', function (req, res, next) {
         const userAgent = useragent.lookup(req.headers['user-agent']);
         let origin = req.get('Referrer') || req.get('Origin') || req.get('Host') || '*';
-        if (origin === 'null' && userAgent.family === 'Chrome' || userAgent.family === 'HeadlessChrome') { origin = 'file://'; }
+        if (origin === 'null' && userAgent.family === 'Chrome') { origin = 'file://'; }
         res.header('Access-Control-Allow-Origin', origin);
         res.header('Access-Control-Allow-Credentials', 'true');
         res.header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
