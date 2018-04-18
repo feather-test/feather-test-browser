@@ -91,7 +91,7 @@ function createFeatherSpecBundle (options, relativeToAsArray, done) {
         sourcemaps: []
     });
 
-    fs.createReadStream('assets/passing.gif').pipe(fs.createWriteStream(options.destDir + '/passing.gif'));
+    fs.createReadStream(__dirname + '/assets/passing.gif').pipe(fs.createWriteStream(options.destDir + '/passing.gif'));
     utils.writeFile(options.destDir + '/featherSpecs.js', testBundle.contents, done);
 }
 
