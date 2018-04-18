@@ -81,7 +81,6 @@ function createFeatherSpecBundle (options, relativeToAsArray, done) {
     let specBundleTemplate = Handlebars.compile(fs.readFileSync(__dirname + '/templates/featherSpecs.js', 'utf8'));
     let specBundleContents = specBundleTemplate({
         pathToFeatherTestBrowser: pathToFeatherTestBrowser,
-        passingImage: '/assets/finished.gif',
         specMap: specMap,
     });
 
@@ -92,6 +91,7 @@ function createFeatherSpecBundle (options, relativeToAsArray, done) {
         sourcemaps: []
     });
 
+    fs.createReadStream('assets/passing.gif').pipe(fs.createWriteStream(options.destDir + '/passing.gif'));
     utils.writeFile(options.destDir + '/featherSpecs.js', testBundle.contents, done);
 }
 

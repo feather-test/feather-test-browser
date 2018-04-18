@@ -3,13 +3,12 @@
  */
 
 var runInBrowser = require('{{pathToFeatherTestBrowser}}/lib/runInBrowser.js');
-var passingImageSrc = '{{pathToFeatherTestBrowser}}{{passingImage}}';
 
 require.cache.clear();
 
 var FeatherTestSpecMap = {{{specMap}}};
 
-runInBrowser(FeatherTestSpecMap, passingImageSrc);
+runInBrowser(FeatherTestSpecMap);
 
 /* cleanup environment */
 __dirname = "/";
