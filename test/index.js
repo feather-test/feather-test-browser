@@ -54,9 +54,10 @@ require('./configurations/passing.js')(function () {
         require('./configurations/failing.js')(function () {
             require('./configurations/errors.js')(function () {
                 require('./configurations/timeout.js')(function () {
-                    console.log = LOG.out;
-                    console.log();
-                    validate.all(LOG.history, [
+                    require('./configurations/feathernet.js')(function () {
+                        console.log = LOG.out;
+                        console.log();
+                        validate.all(LOG.history, [
 '*',
 'Running specs_features_any',
 'Running specs_features_async',
@@ -68,7 +69,7 @@ require('./configurations/passing.js')(function () {
 'Running specs_features_scope1',
 'Running specs_features_scope2',
 'Running specs_features_spy',
-'\nAll 32 tests passed!',
+'\nAll 33 tests passed!',
 '\n(1 tests skipped)',
 '*',
 'Running specs_modules_one_spec',
@@ -157,7 +158,17 @@ require('./configurations/passing.js')(function () {
 '*',
 '',
 '1 tests failed!',
-                    ]);
+'*',
+'*',
+'*',
+'Running specs_feathernet_appendChild_spec',
+'Running specs_feathernet_calls_spec',
+'Running specs_feathernet_fetch_spec',
+'Running specs_feathernet_sendBeacon_spec',
+'Running specs_feathernet_xhr_spec',
+'\nAll 21 tests passed!',
+                        ]);
+                    });
                 });
             });
         });
