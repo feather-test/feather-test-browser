@@ -19,9 +19,7 @@ var testSuite = new FeatherTestBrowser({
         }
     ],
     bundlPack: {
-        js: babelProcessor({
-            presets: ['env'],
-        })
+        js: babelProcessor,
     },
 });
 

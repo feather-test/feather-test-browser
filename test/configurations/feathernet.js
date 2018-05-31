@@ -21,9 +21,7 @@ var testSuite = new FeatherTestBrowser({
         }
     ],
     bundlPack: {
-        js: babelProcessor({
-            presets: ['env'],
-        })
+        js: babelProcessor,
     },
     networkIntercept: {
         keepalive: !args.ci,

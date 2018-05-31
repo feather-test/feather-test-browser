@@ -164,6 +164,7 @@ require('./configurations/passing.js')(function () {
 'Running specs_feathernet_appendChild_spec',
 'Running specs_feathernet_calls_spec',
 'Running specs_feathernet_fetch_spec',
+'*',
 'Running specs_feathernet_sendBeacon_spec',
 'Running specs_feathernet_xhr_spec',
 '\nAll 21 tests passed!',

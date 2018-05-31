@@ -56,14 +56,8 @@ function createFeatherRunnerBundle (options, done) {
         plugins: pluginsStr,
     });
 
-    let testBundle = bundlPack(bundlPackOptions).one.call({ LINES: runnerBundleContents.split('\n').length + 3 }, runnerBundleContents, {
-        name: 'featherRunner.js',
-        contents: runnerBundleContents,
-        src: [],
-        sourcemaps: []
-    });
-
-    utils.writeFile(options.destDir + '/featherRunner.js', testBundle.contents, done);
+    let testBundle = bundlPack.create(runnerBundleContents, bundlPackOptions);
+    utils.writeFile(options.destDir + '/featherRunner.js', testBundle, done);
 }
 
 function createFeatherSpecBundle (options, relativeToAsArray, done) {
@@ -84,15 +78,9 @@ function createFeatherSpecBundle (options, relativeToAsArray, done) {
         specMap: specMap,
     });
 
-    let testBundle = bundlPack(bundlPackOptions).one.call({ LINES: specBundleContents.split('\n').length + 3 }, specBundleContents, {
-        name: 'featherSpecs.js',
-        contents: specBundleContents,
-        src: [],
-        sourcemaps: []
-    });
-
+    let testBundle = bundlPack.create(specBundleContents, bundlPackOptions);
     fs.createReadStream(__dirname + '/assets/passing.gif').pipe(fs.createWriteStream(options.destDir + '/passing.gif'));
-    utils.writeFile(options.destDir + '/featherSpecs.js', testBundle.contents, done);
+    utils.writeFile(options.destDir + '/featherSpecs.js', testBundle, done);
 }
 
 function getSpecName (specPath, relativeToAsArray) {
@@ -177,7 +165,10 @@ function runChromeHeadless (testUrl, welcomeNote, options, callback) {
 
                     case 'error':
                         failed = true;
-                        console.log(consoleMessage.text());
+                        const msg = consoleMessage.text();
+                        if (msg.indexOf('Failed to load resource:') !== 0) {
+                            console.log(msg);
+                        }
                         break;
 
                     default:
