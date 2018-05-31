@@ -135,6 +135,7 @@ function runChromeHeadless (testUrl, welcomeNote, options, callback) {
             function shutdown () {
                 page.close().then(() => { browser.close(); });
                 if (failed && options.exitProcessWhenFailing) {
+                    console.log('Exit Failing');
                     process.exit(1);
                 }
                 callback();
@@ -164,9 +165,9 @@ function runChromeHeadless (testUrl, welcomeNote, options, callback) {
                         break;
 
                     case 'error':
-                        failed = true;
                         const msg = consoleMessage.text();
                         if (msg.indexOf('Failed to load resource:') !== 0) {
+                            failed = true;
                             console.log(msg);
                         }
                         break;
