@@ -56,8 +56,9 @@ function createFeatherRunnerBundle (options, done) {
         plugins: pluginsStr,
     });
 
-    let testBundle = bundlPack.create(runnerBundleContents, bundlPackOptions);
-    utils.writeFile(options.destDir + '/featherRunner.js', testBundle, done);
+    bundlPack.create(runnerBundleContents, bundlPackOptions, function (testBundle) {
+        utils.writeFile(options.destDir + '/featherRunner.js', testBundle, done);
+    });
 }
 
 function createFeatherSpecBundle (options, relativeToAsArray, done) {
@@ -78,9 +79,10 @@ function createFeatherSpecBundle (options, relativeToAsArray, done) {
         specMap: specMap,
     });
 
-    let testBundle = bundlPack.create(specBundleContents, bundlPackOptions);
-    fs.createReadStream(__dirname + '/assets/passing.gif').pipe(fs.createWriteStream(options.destDir + '/passing.gif'));
-    utils.writeFile(options.destDir + '/featherSpecs.js', testBundle, done);
+    bundlPack.create(specBundleContents, bundlPackOptions, function (testBundle) {
+        fs.createReadStream(__dirname + '/assets/passing.gif').pipe(fs.createWriteStream(options.destDir + '/passing.gif'));
+        utils.writeFile(options.destDir + '/featherSpecs.js', testBundle, done);
+    });
 }
 
 function getSpecName (specPath, relativeToAsArray) {
